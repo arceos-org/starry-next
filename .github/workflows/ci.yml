@@ -1,0 +1,48 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  clippy:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust-toolchain: [nightly]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@nightly
+      with:
+        toolchain: ${{ matrix.rust-toolchain }}
+        components: rust-src, clippy, rustfmt
+    - name: Setup ArceOS
+      run: ./scripts/get_deps.sh
+    - name: Check rust version
+      run: rustc --version --verbose
+    - name: Check code format
+      run: cargo fmt -- --check
+    - name: Clippy
+      run: cargo clippy
+    - name: Build for rust-std
+      run: cargo build
+
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        arch: [x86_64, riscv64, aarch64]
+        rust-toolchain: [nightly]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: ${{ matrix.rust-toolchain }}
+        components: rust-src, llvm-tools
+        targets: x86_64-unknown-none
+    - uses: Swatinem/rust-cache@v2
+    - run: cargo install cargo-binutils
+    - run: ./scripts/get_deps.sh
+    - name: Build for ${{ matrix.arch }}
+      run: make ARCH=${{ matrix.arch }}

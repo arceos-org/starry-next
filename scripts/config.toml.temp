@@ -1,0 +1,2 @@
+[patch.'https://github.com/arceos-org/arceos.git']
+axstd = { path = "%AX_ROOT%/ulib/axstd" }

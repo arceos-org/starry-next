@@ -1,0 +1,10 @@
+[package]
+name = "starry"
+version = "0.1.0"
+edition = "2021"
+authors = ["Azure-stars <Azure_stars@126.com>", "Yuekai Jia <equation618@gmail.com>"]
+homepage = "https://github.com/arceos-org/arceos"
+repository = "https://github.com/arceos-org/starry-next"
+
+[dependencies]
+axstd = { git = "https://github.com/arceos-org/arceos.git" }
