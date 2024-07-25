@@ -7,4 +7,10 @@ homepage = "https://github.com/arceos-org/arceos"
 repository = "https://github.com/arceos-org/starry-next"
 
 [dependencies]
-axstd = { git = "https://github.com/arceos-org/arceos.git" }
+log = "0.4"
+memory_addr = "0.2"
+
+axstd = { git = "https://github.com/arceos-org/arceos.git", features = ["paging"] }
+axhal = { git = "https://github.com/arceos-org/arceos.git", features = ["uspace"] }
+axmm = { git = "https://github.com/arceos-org/arceos.git" }
+axruntime = { git = "https://github.com/arceos-org/arceos.git" }

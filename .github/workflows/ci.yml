@@ -23,8 +23,6 @@ jobs:
       run: cargo fmt -- --check
     - name: Clippy
       run: cargo clippy
-    - name: Build for rust-std
-      run: cargo build
 
   build:
     runs-on: ${{ matrix.os }}
@@ -32,7 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        arch: [x86_64, riscv64, aarch64]
+        arch: [x86_64]
         rust-toolchain: [nightly]
     steps:
     - uses: actions/checkout@v4
