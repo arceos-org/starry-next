@@ -6,6 +6,7 @@ extern crate log;
 extern crate alloc;
 extern crate axstd;
 
+mod syscall;
 mod task;
 
 use alloc::sync::Arc;

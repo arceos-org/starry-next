@@ -1,5 +1,6 @@
 [patch.'https://github.com/arceos-org/arceos.git']
 axstd = { path = "%AX_ROOT%/ulib/axstd" }
+arceos_posix_api = { path = "%AX_ROOT%/api/arceos_posix_api" }
 axhal = { path = "%AX_ROOT%/modules/axhal" }
 axmm = { path = "%AX_ROOT%/modules/axmm" }
 axtask = { path = "%AX_ROOT%/modules/axtask" }
