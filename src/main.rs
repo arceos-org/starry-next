@@ -6,12 +6,22 @@ extern crate log;
 extern crate alloc;
 extern crate axstd;
 
+mod task;
+
+use alloc::sync::Arc;
+
 use axhal::arch::UspaceContext;
 use axhal::mem::virt_to_phys;
 use axhal::paging::MappingFlags;
+use axmm::AddrSpace;
+use axsync::Mutex;
+use axtask::{AxTaskRef, TaskExtRef, TaskInner};
 use memory_addr::VirtAddr;
 
+use self::task::TaskExt;
+
 const USER_STACK_SIZE: usize = 4096;
+const KERNEL_STACK_SIZE: usize = 0x40000; // 256 KiB
 
 fn app_main(arg0: usize) {
     unsafe {
@@ -31,6 +41,28 @@ fn app_main(arg0: usize) {
     }
 }
 
+fn spawn_user_task(aspace: Arc<Mutex<AddrSpace>>, uctx: UspaceContext) -> AxTaskRef {
+    let mut task = TaskInner::new(
+        || {
+            let curr = axtask::current();
+            let kstack_top = curr.kernel_stack_top().unwrap();
+            info!(
+                "Enter user space: entry={:#x}, ustack={:#x}, kstack={:#x}",
+                curr.task_ext().uctx.get_ip(),
+                curr.task_ext().uctx.get_sp(),
+                kstack_top,
+            );
+            unsafe { curr.task_ext().uctx.enter_uspace(kstack_top) };
+        },
+        "".into(),
+        KERNEL_STACK_SIZE,
+    );
+    task.ctx_mut()
+        .set_page_table_root(aspace.lock().page_table_root());
+    task.init_task_ext(TaskExt::new(uctx, aspace));
+    axtask::spawn_task(task)
+}
+
 #[no_mangle]
 fn main() -> ! {
     let entry = VirtAddr::from(app_main as usize);
@@ -41,10 +73,6 @@ fn main() -> ! {
     let layout = core::alloc::Layout::from_size_align(USER_STACK_SIZE, 4096).unwrap();
     let ustack = unsafe { alloc::alloc::alloc(layout) };
     let ustack_paddr = virt_to_phys(VirtAddr::from(ustack as _));
-
-    let kstack_top: usize;
-    unsafe { core::arch::asm!("mov {}, rsp", out(reg) kstack_top) };
-    let kstack_top = VirtAddr::align_down(kstack_top.into(), 16usize);
 
     let mut uspace = axmm::new_user_aspace().unwrap();
     let ustack_top = uspace.end();
@@ -67,13 +95,11 @@ fn main() -> ! {
         .unwrap();
 
     info!("New user address space: {:#x?}", uspace);
-    let ctx = UspaceContext::new(entry_vaddr.into(), ustack_top, 2333);
-    info!(
-        "Enter user space: entry={:#x}, ustack={:#x}, kstack={:#x}",
-        entry_vaddr, ustack_top, kstack_top,
+    spawn_user_task(
+        Arc::new(Mutex::new(uspace)),
+        UspaceContext::new(entry_vaddr.into(), ustack_top, 2333),
     );
-    unsafe {
-        axhal::arch::write_page_table_root(uspace.page_table_root());
-        ctx.enter_uspace(kstack_top)
-    }
+
+    axtask::WaitQueue::new().wait();
+    unreachable!()
 }

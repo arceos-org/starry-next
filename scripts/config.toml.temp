@@ -2,4 +2,6 @@
 axstd = { path = "%AX_ROOT%/ulib/axstd" }
 axhal = { path = "%AX_ROOT%/modules/axhal" }
 axmm = { path = "%AX_ROOT%/modules/axmm" }
+axtask = { path = "%AX_ROOT%/modules/axtask" }
+axsync = { path = "%AX_ROOT%/modules/axsync" }
 axruntime = { path = "%AX_ROOT%/modules/axruntime" }

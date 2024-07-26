@@ -13,4 +13,6 @@ memory_addr = "0.2"
 axstd = { git = "https://github.com/arceos-org/arceos.git", features = ["paging"] }
 axhal = { git = "https://github.com/arceos-org/arceos.git", features = ["uspace"] }
 axmm = { git = "https://github.com/arceos-org/arceos.git" }
-axruntime = { git = "https://github.com/arceos-org/arceos.git" }
+axtask = { git = "https://github.com/arceos-org/arceos.git" }
+axsync = { git = "https://github.com/arceos-org/arceos.git" }
+axruntime = { git = "https://github.com/arceos-org/arceos.git", features = ["multitask"] }
