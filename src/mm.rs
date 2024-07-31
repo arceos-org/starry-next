@@ -8,6 +8,8 @@ use axmm::AddrSpace;
 use axtask::TaskExtRef;
 
 pub fn load_user_app(entry_fn: fn(usize)) -> AxResult<(VirtAddr, VirtAddr, AddrSpace)> {
+    crate::loader::list_apps();
+
     let entry_fn_kvaddr = VirtAddr::from(entry_fn as usize);
     let load_vaddr = VirtAddr::from(0x1000);
     let load_paddr = virt_to_phys(entry_fn_kvaddr.align_down_4k());

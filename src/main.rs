@@ -6,10 +6,10 @@ extern crate log;
 extern crate alloc;
 extern crate axstd;
 
+mod loader;
 mod mm;
 mod syscall;
 mod task;
-
 use alloc::sync::Arc;
 
 use axhal::arch::UspaceContext;
