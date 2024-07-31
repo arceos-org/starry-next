@@ -20,7 +20,7 @@ fn sys_clone(tf: &TrapFrame, newsp: usize) -> usize {
     let mut uctx = UspaceContext::from(tf);
     uctx.set_sp(newsp);
     uctx.set_retval(0);
-    let new_task = super::spawn_user_task(aspace, uctx);
+    let new_task = crate::task::spawn_user_task(aspace, uctx);
     new_task.id().as_u64() as usize
 }
 
