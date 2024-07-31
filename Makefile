@@ -8,7 +8,7 @@ ax_root:
 user_apps:
 	@cd ./apps && make ARCH=$(ARCH) build
 
-build run justrun debug disasm clean:user_apps ax_root
+build run justrun debug disasm clean: ax_root
 	@make -C $(AX_ROOT) A=$(PWD) $@
 
 .PHONY: all ax_root build run justrun debug disasm clean

@@ -5,6 +5,11 @@
 //! Now these apps are loaded into memory as a part of the kernel image.
 use core::arch::global_asm;
 
+use alloc::vec;
+use alloc::vec::Vec;
+use axhal::paging::MappingFlags;
+use memory_addr::VirtAddr;
+
 global_asm!(include_str!(concat!(env!("OUT_DIR"), "/link_app.S")));
 
 extern "C" {
@@ -52,6 +57,7 @@ pub(crate) fn get_app_data_by_name(name: &str) -> Option<&'static [u8]> {
 }
 
 /// List all apps.
+#[allow(unused)]
 pub(crate) fn list_apps() {
     info!("/**** APPS ****");
     let app_count = get_app_count();
@@ -59,4 +65,111 @@ pub(crate) fn list_apps() {
         info!("{}", get_app_name(i));
     }
     info!("**************/");
+}
+
+/// The segment of the elf file, which is used to map the elf file to the memory space
+pub struct ELFSegment {
+    /// The start virtual address of the segment
+    pub start_vaddr: VirtAddr,
+    /// The size of the segment
+    pub size: usize,
+    /// The flags of the segment which is used to set the page table entry
+    pub flags: MappingFlags,
+    /// The data of the segment
+    #[allow(unused)]
+    pub data: Vec<u8>,
+}
+
+/// The information of a given ELF file
+pub struct ELFInfo {
+    /// The entry point of the ELF file
+    pub entry: VirtAddr,
+    /// The segments of the ELF file
+    pub segments: Vec<ELFSegment>,
+}
+
+/// Load the ELF files by the given app name and return
+/// the segments of the ELF file
+///
+/// # Arguments
+/// * `name` - The name of the app
+///
+/// # Returns
+/// Entry and information about segments of the given ELF file
+pub(crate) fn load_user_app(name: &str) -> ELFInfo {
+    use xmas_elf::program::{Flags, SegmentData};
+    use xmas_elf::{header, ElfFile};
+
+    let elf = ElfFile::new(get_app_data_by_name(name).expect("invalid APP name"))
+        .expect("invalid ELF file");
+    let elf_header = elf.header;
+
+    let elf_magic_number = elf_header.pt1.magic;
+
+    assert_eq!(elf_magic_number, [0x7f, 0x45, 0x4c, 0x46], "invalid elf!");
+
+    assert_eq!(
+        elf.header.pt2.type_().as_type(),
+        header::Type::Executable,
+        "ELF is not an executable object"
+    );
+
+    let expect_arch = if cfg!(target_arch = "x86_64") {
+        header::Machine::X86_64
+    } else if cfg!(target_arch = "aarch64") {
+        header::Machine::AArch64
+    } else if cfg!(target_arch = "riscv64") {
+        header::Machine::RISC_V
+    } else {
+        panic!("Unsupported architecture!");
+    };
+    assert_eq!(
+        elf.header.pt2.machine().as_machine(),
+        expect_arch,
+        "invalid ELF arch"
+    );
+
+    fn into_mapflag(f: Flags) -> MappingFlags {
+        let mut ret = MappingFlags::USER;
+        if f.is_read() {
+            ret |= MappingFlags::READ;
+        }
+        if f.is_write() {
+            ret |= MappingFlags::WRITE;
+        }
+        if f.is_execute() {
+            ret |= MappingFlags::EXECUTE;
+        }
+        ret
+    }
+
+    let mut segments = Vec::new();
+    elf.program_iter()
+        .filter(|ph| ph.get_type() == Ok(xmas_elf::program::Type::Load))
+        .for_each(|ph| {
+            // align the segment to 4k
+            let st_vaddr = VirtAddr::from(ph.virtual_addr() as usize);
+            let st_vaddr_align: VirtAddr = st_vaddr.align_down_4k();
+            let ed_vaddr_align =
+                VirtAddr::from((ph.virtual_addr() + ph.mem_size()) as usize).align_up_4k();
+            let data = match ph.get_data(&elf).unwrap() {
+                SegmentData::Undefined(data) => {
+                    // fill start_vaddr_align to start_vaddr with 0
+                    let mut extend_data = vec![0; st_vaddr.as_usize() - st_vaddr_align.as_usize()];
+                    extend_data.extend_from_slice(data);
+                    extend_data
+                }
+                _ => panic!("failed to get ELF segment data"),
+            };
+            segments.push(ELFSegment {
+                start_vaddr: st_vaddr_align,
+                size: ed_vaddr_align.as_usize() - st_vaddr_align.as_usize(),
+                flags: into_mapflag(ph.flags()),
+                data,
+            });
+        });
+    ELFInfo {
+        entry: VirtAddr::from(elf.header.pt2.entry_point() as usize),
+        segments,
+    }
 }
