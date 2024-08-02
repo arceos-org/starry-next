@@ -100,8 +100,10 @@ pub(crate) fn load_user_app(name: &str) -> ELFInfo {
     use xmas_elf::program::{Flags, SegmentData};
     use xmas_elf::{header, ElfFile};
 
-    let elf = ElfFile::new(get_app_data_by_name(name).expect("invalid APP name"))
-        .expect("invalid ELF file");
+    let elf = ElfFile::new(
+        get_app_data_by_name(name).unwrap_or_else(|| panic!("failed to get app: {}", name)),
+    )
+    .expect("invalid ELF file");
     let elf_header = elf.header;
 
     let elf_magic_number = elf_header.pt1.magic;

@@ -7,9 +7,7 @@ A monolithic kernel based on [ArceOS](https://github.com/arceos-org/arceos).
 ## Quick Start
 ```sh
 # Build user applications
-cd apps
-make ARCH=x86_64 build
-cd ..
+make user_apps
 
 # Build kernel
 make ARCH=x86_64 build

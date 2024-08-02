@@ -10,7 +10,7 @@ mod loader;
 mod mm;
 mod syscall;
 mod task;
-use alloc::sync::Arc;
+use alloc::{sync::Arc, vec::Vec};
 
 use axhal::arch::UspaceContext;
 use axsync::Mutex;
@@ -18,11 +18,14 @@ use axsync::Mutex;
 const USER_STACK_SIZE: usize = 4096;
 const KERNEL_STACK_SIZE: usize = 0x40000; // 256 KiB
 
-const TESTCASES: &[&str] = &["hello_world", "exit", "sleep", "yield", "cyclictest"];
-
 #[no_mangle]
 fn main() {
-    for testcase in TESTCASES {
+    let testcases: Vec<&'static str> = option_env!("AX_TESTCASES_LIST")
+        .expect("Please specify the testcases list by making user_apps")
+        .split(',')
+        .filter(|&x| !x.is_empty())
+        .collect();
+    for testcase in testcases {
         let (entry_vaddr, ustack_top, uspace) = mm::load_user_app(testcase).unwrap();
         let user_task = task::spawn_user_task(
             Arc::new(Mutex::new(uspace)),

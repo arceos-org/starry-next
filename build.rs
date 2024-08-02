@@ -11,7 +11,9 @@ fn main() {
 }
 
 fn link_app_data(arch: &str) -> Result<()> {
-    let app_path = PathBuf::from("./apps/build/").join(arch);
+    let testcase = option_env!("AX_TESTCASE").unwrap_or("nimbos");
+
+    let app_path = PathBuf::from(format!("apps/{}/build/{}", testcase, arch));
     let link_app_path = PathBuf::from(std::env::var("OUT_DIR").unwrap()).join("link_app.S");
 
     if let Ok(dir) = read_dir(&app_path) {
