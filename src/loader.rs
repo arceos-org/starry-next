@@ -5,7 +5,6 @@
 //! Now these apps are loaded into memory as a part of the kernel image.
 use core::arch::global_asm;
 
-use alloc::vec;
 use alloc::vec::Vec;
 use axhal::paging::MappingFlags;
 use memory_addr::VirtAddr;
@@ -57,7 +56,6 @@ pub(crate) fn get_app_data_by_name(name: &str) -> Option<&'static [u8]> {
 }
 
 /// List all apps.
-#[allow(unused)]
 pub(crate) fn list_apps() {
     info!("/**** APPS ****");
     let app_count = get_app_count();
@@ -76,8 +74,9 @@ pub struct ELFSegment {
     /// The flags of the segment which is used to set the page table entry
     pub flags: MappingFlags,
     /// The data of the segment
-    #[allow(unused)]
-    pub data: Vec<u8>,
+    pub data: &'static [u8],
+    /// The offset of the segment relative to the start of the page
+    pub offset: usize,
 }
 
 /// The information of a given ELF file
@@ -108,7 +107,7 @@ pub(crate) fn load_user_app(name: &str) -> ELFInfo {
 
     let elf_magic_number = elf_header.pt1.magic;
 
-    assert_eq!(elf_magic_number, [0x7f, 0x45, 0x4c, 0x46], "invalid elf!");
+    assert_eq!(elf_magic_number, *b"\x7fELF", "invalid elf!");
 
     assert_eq!(
         elf.header.pt2.type_().as_type(),
@@ -155,12 +154,7 @@ pub(crate) fn load_user_app(name: &str) -> ELFInfo {
             let ed_vaddr_align =
                 VirtAddr::from((ph.virtual_addr() + ph.mem_size()) as usize).align_up_4k();
             let data = match ph.get_data(&elf).unwrap() {
-                SegmentData::Undefined(data) => {
-                    // fill start_vaddr_align to start_vaddr with 0
-                    let mut extend_data = vec![0; st_vaddr.as_usize() - st_vaddr_align.as_usize()];
-                    extend_data.extend_from_slice(data);
-                    extend_data
-                }
+                SegmentData::Undefined(data) => data,
                 _ => panic!("failed to get ELF segment data"),
             };
             segments.push(ELFSegment {
@@ -168,6 +162,7 @@ pub(crate) fn load_user_app(name: &str) -> ELFInfo {
                 size: ed_vaddr_align.as_usize() - st_vaddr_align.as_usize(),
                 flags: into_mapflag(ph.flags()),
                 data,
+                offset: st_vaddr.as_usize() - st_vaddr_align.as_usize(),
             });
         });
     ELFInfo {

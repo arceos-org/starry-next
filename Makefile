@@ -4,13 +4,13 @@ ARCH ?= x86_64
 
 export AX_TESTCASES_LIST=$(shell cat ./apps/$(AX_TESTCASE)/testcase_list | tr '\n' ',')
 
-all:user_apps build
+all: build
 
 ax_root:
 	@./scripts/set_ax_root.sh $(AX_ROOT)
 
 user_apps:
-	@cd ./apps/$(AX_TESTCASE) && make ARCH=$(ARCH) build
+	@make -C ./apps/$(AX_TESTCASE) ARCH=$(ARCH) build
 
 test:
 	@./scripts/app_test.sh

@@ -15,13 +15,14 @@ use alloc::{sync::Arc, vec::Vec};
 use axhal::arch::UspaceContext;
 use axsync::Mutex;
 
-const USER_STACK_SIZE: usize = 4096;
+const USER_STACK_SIZE: usize = 0x10000;
 const KERNEL_STACK_SIZE: usize = 0x40000; // 256 KiB
 
 #[no_mangle]
 fn main() {
+    loader::list_apps();
     let testcases: Vec<&'static str> = option_env!("AX_TESTCASES_LIST")
-        .expect("Please specify the testcases list by making user_apps")
+        .unwrap_or_else(|| "Please specify the testcases list by making user_apps")
         .split(',')
         .filter(|&x| !x.is_empty())
         .collect();

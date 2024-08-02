@@ -28,16 +28,18 @@ pub fn load_user_app(app_name: &str) -> AxResult<(VirtAddr, VirtAddr, AddrSpace)
             .unwrap_or_else(|_| panic!("Mapping failed for segment: {:#x?}", segement.start_vaddr));
 
         // Copy data of the segment to the physical memory
-        let segement_data = segement.data.as_slice();
         let segement_start_vaddr = phys_to_virt(segement_start_paddr).as_mut_ptr();
-        let segement_data_ptr = segement_data.as_ptr();
+        let segement_data_ptr = segement.data.as_ptr();
         unsafe {
+            // Copy and align the data to the start of the page
+            // FIXME: Handle data length exceeding the page size
             core::ptr::copy_nonoverlapping(
                 segement_data_ptr,
-                segement_start_vaddr,
-                segement_data.len(),
+                segement_start_vaddr.add(segement.offset),
+                segement.data.len(),
             );
         }
+        // TDOO: flush the I-cache
     }
 
     let ustack_top = uspace.end();

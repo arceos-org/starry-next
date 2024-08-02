@@ -108,11 +108,12 @@ function test_one() {
 
 # TODO: add more testcases
 test_list=(
-    "apps/nimbos"
+    "nimbos"
 )
 
 for t in ${test_list[@]}; do
-    APP=$(realpath "$(pwd)/$t")
+    APP=$(realpath "$(pwd)/apps/$t")
+    make -C "$ROOT" user_apps AX_TESTCASE=$t
     echo -e "${CYAN_C}Testing${END_C} $t:"
     source "$APP/test_cmd"
 done

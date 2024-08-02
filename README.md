@@ -6,6 +6,9 @@ A monolithic kernel based on [ArceOS](https://github.com/arceos-org/arceos).
 
 ## Quick Start
 ```sh
+# Clone the base repository
+./scripts/get_deps.sh
+
 # Build user applications
 make user_apps
 
