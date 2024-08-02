@@ -63,10 +63,10 @@ jobs:
     - uses: Swatinem/rust-cache@v2
     - run: cargo install cargo-binutils
     - run: ./scripts/get_deps.sh
-    - uses: ./.arceos/.github/workflows/actions/setup-musl
+    - uses: ./.github/workflows/actions/setup-musl
       with:
         arch: ${{ matrix.arch }}
-    - uses: ./.arceos/.github/workflows/actions/setup-qemu
+    - uses: ./.github/workflows/actions/setup-qemu
       with:
         qemu-version: ${{ env.qemu-version }}
     - name: Run tests

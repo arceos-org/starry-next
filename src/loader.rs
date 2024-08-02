@@ -162,7 +162,7 @@ pub(crate) fn load_user_app(name: &str) -> ELFInfo {
                 size: ed_vaddr_align.as_usize() - st_vaddr_align.as_usize(),
                 flags: into_mapflag(ph.flags()),
                 data,
-                offset: st_vaddr.as_usize() - st_vaddr_align.as_usize(),
+                offset: st_vaddr.align_offset_4k(),
             });
         });
     ELFInfo {

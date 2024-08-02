@@ -15,7 +15,11 @@ user_apps:
 test:
 	@./scripts/app_test.sh
 
-build run justrun debug disasm clean: ax_root
+build run justrun debug disasm: ax_root
 	@make -C $(AX_ROOT) A=$(PWD) $@
+
+clean: ax_root
+	@make -C $(AX_ROOT) A=$(PWD) clean
+	@cargo clean
 
 .PHONY: all ax_root build run justrun debug disasm clean
