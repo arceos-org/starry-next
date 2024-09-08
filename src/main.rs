@@ -4,13 +4,17 @@
 #[macro_use]
 extern crate log;
 extern crate alloc;
-extern crate axstd;
+#[macro_use]
+extern crate axstd as std;
 
 mod loader;
 mod mm;
 mod syscall;
 mod task;
 use alloc::sync::Arc;
+
+use std::thread;
+use std::time::Duration;
 
 use axhal::arch::UspaceContext;
 use axsync::Mutex;
@@ -33,5 +37,10 @@ fn main() {
         );
         let exit_code = user_task.join();
         info!("User task {} exited with code: {:?}", testcase, exit_code);
+    }
+
+    loop {
+        println!("Starry tick...");
+        thread::sleep(Duration::from_secs(1));
     }
 }
