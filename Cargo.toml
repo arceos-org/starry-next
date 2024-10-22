@@ -10,7 +10,9 @@ repository = "https://github.com/arceos-org/starry-next"
 log = "0.4"
 linkme = "0.3"
 axerrno = "0.1"
+lazyinit = "0.2"
 memory_addr = "0.2"
+crate_interface = "0.1"
 
 axstd = { git = "https://github.com/arceos-org/arceos.git", features = ["paging"] }
 arceos_posix_api = { git = "https://github.com/arceos-org/arceos.git" }
@@ -20,3 +22,4 @@ axmm = { git = "https://github.com/arceos-org/arceos.git" }
 axtask = { git = "https://github.com/arceos-org/arceos.git" }
 axsync = { git = "https://github.com/arceos-org/arceos.git" }
 axruntime = { git = "https://github.com/arceos-org/arceos.git", features = ["multitask"] }
+axns = { git = "https://github.com/arceos-org/arceos.git", features = ["thread-local"] }

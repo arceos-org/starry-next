@@ -22,7 +22,7 @@ fn app_main(arg0: usize) {
     unsafe {
         core::arch::asm!(
             "2:",
-            "int3",
+            // "int3",
             "mov rax, r12",
             "push rax",
             "syscall",
@@ -44,6 +44,14 @@ fn main() {
         Arc::new(Mutex::new(uspace)),
         UspaceContext::new(entry_vaddr.into(), ustack_top, 2333),
     );
+
+    let (entry_vaddr, ustack_top, uspace) = mm::load_user_app(app_main).unwrap();
+    let user_task2 = task::spawn_user_task(
+        Arc::new(Mutex::new(uspace)),
+        UspaceContext::new(entry_vaddr.into(), ustack_top, 2333),
+    );
     let exit_code = user_task.join();
+    let exit_code2 = user_task2.join();
     info!("User task exited with code: {:?}", exit_code);
+    info!("User task2 exited with code: {:?}", exit_code2);
 }
