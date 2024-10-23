@@ -1,22 +1,21 @@
 #![no_std]
 #![no_main]
+#![doc = include_str!("../README.md")]
 
 #[macro_use]
 extern crate log;
 extern crate alloc;
 extern crate axstd;
 
+mod config;
 mod loader;
 mod mm;
-mod syscall;
+mod syscall_imp;
 mod task;
 use alloc::sync::Arc;
 
 use axhal::arch::UspaceContext;
 use axsync::Mutex;
-
-const USER_STACK_SIZE: usize = 0x10000;
-const KERNEL_STACK_SIZE: usize = 0x40000; // 256 KiB
 
 #[no_mangle]
 fn main() {
@@ -26,6 +25,7 @@ fn main() {
         .split(',')
         .filter(|&x| !x.is_empty());
     for testcase in testcases {
+        log::info!("Running testcase: {}", testcase);
         let (entry_vaddr, ustack_top, uspace) = mm::load_user_app(testcase).unwrap();
         let user_task = task::spawn_user_task(
             Arc::new(Mutex::new(uspace)),
