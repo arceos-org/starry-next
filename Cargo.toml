@@ -13,7 +13,6 @@ axerrno = "0.1"
 memory_addr = "0.3"
 xmas-elf = "0.9"
 bitflags = "2.6"
-
 kernel-elf-parser = "0.1.0"
 num_enum = { version = "0.7", default-features = false }
 syscalls = { version = "0.6", default-features = false }

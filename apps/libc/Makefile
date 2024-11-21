@@ -58,7 +58,8 @@ build_rust:
 		for app in $(shell find rust -name Cargo.toml); do \
 			echo "Building $$(dirname $${app})"; \
 			app_name=$$(basename $$(dirname $${app})); \
-			RUSTFLAGS=$(RUSTFLAGS) cargo build --release --target $(RUST_TARGET) --manifest-path $${app} ; \
+      export RUSTFLAGS=$(RUSTFLAGS); \
+			cargo build --release --target $(RUST_TARGET) --manifest-path $${app} ; \
 			cp $$(dirname $${app})/target/$(RUST_TARGET)/release/$${app_name} build/$(ARCH)/$${app_name}_rust ; \
 		done \
 	fi

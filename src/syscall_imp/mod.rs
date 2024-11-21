@@ -2,16 +2,18 @@ mod fs;
 mod mm;
 mod task;
 mod time;
+
 use axerrno::LinuxError;
 use axhal::{
     arch::TrapFrame,
     trap::{register_trap_handler, SYSCALL},
 };
-use fs::*;
-use mm::*;
 use syscalls::Sysno;
-use task::*;
-use time::*;
+
+use self::fs::*;
+use self::mm::*;
+use self::task::*;
+use self::time::*;
 
 /// Macro to generate syscall body
 ///

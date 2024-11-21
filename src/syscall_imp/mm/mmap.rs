@@ -6,10 +6,10 @@ use memory_addr::{VirtAddr, VirtAddrRange};
 use crate::syscall_body;
 
 bitflags::bitflags! {
-    #[derive(Debug)]
     /// permissions for sys_mmap
     ///
     /// See <https://github.com/bminor/glibc/blob/master/bits/mman.h>
+    #[derive(Debug)]
     struct MmapProt: i32 {
         /// Page can be read.
         const PROT_READ = 1 << 0;
@@ -37,10 +37,10 @@ impl From<MmapProt> for MappingFlags {
 }
 
 bitflags::bitflags! {
-    #[derive(Debug)]
     /// flags for sys_mmap
     ///
     /// See <https://github.com/bminor/glibc/blob/master/bits/mman.h>
+    #[derive(Debug)]
     struct MmapFlags: i32 {
         /// Share changes
         const MAP_SHARED = 1 << 0;
