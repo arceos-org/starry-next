@@ -3,9 +3,9 @@
 //! It will read and parse ELF files.
 //!
 //! Now these apps are loaded into memory as a part of the kernel image.
+use alloc::{collections::btree_map::BTreeMap, vec::Vec};
 use core::arch::global_asm;
 
-use alloc::{collections::btree_map::BTreeMap, vec::Vec};
 use axhal::paging::MappingFlags;
 use memory_addr::{MemoryAddr, VirtAddr};
 

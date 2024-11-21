@@ -1,14 +1,13 @@
 use alloc::string::ToString;
-use axerrno::AxResult;
-use memory_addr::VirtAddr;
 
+use axerrno::AxResult;
 use axhal::{
     paging::MappingFlags,
     trap::{register_trap_handler, PAGE_FAULT},
 };
-
 use axmm::AddrSpace;
 use axtask::TaskExtRef;
+use memory_addr::VirtAddr;
 
 use crate::{config, loader};
 
