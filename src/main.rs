@@ -7,7 +7,10 @@ extern crate log;
 extern crate alloc;
 extern crate axstd;
 
-mod config;
+#[rustfmt::skip]
+mod config {
+    include!(concat!(env!("OUT_DIR"), "/uspace_config.rs"));
+}
 mod loader;
 mod mm;
 mod syscall_imp;
@@ -26,7 +29,7 @@ fn main() {
         .split(',')
         .filter(|&x| !x.is_empty());
     for testcase in testcases {
-        log::info!("Running testcase: {}", testcase);
+        info!("Running testcase: {}", testcase);
         let (entry_vaddr, ustack_top, uspace) = mm::load_user_app(testcase).unwrap();
         let user_task = task::spawn_user_task(
             Arc::new(Mutex::new(uspace)),

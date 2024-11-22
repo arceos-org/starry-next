@@ -99,25 +99,14 @@ fn gen_kernel_config(arch: &str) -> Result<()> {
         let comments = get_comments(&config_content, key).replace('#', "///");
         writeln!(f, "{}", comments)?;
         if let Item::Value(value) = item {
+            writeln!(f, "#[allow(dead_code)]")?;
             let key_name = key.to_uppercase().replace('-', "_");
             match value {
                 toml_edit::Value::Integer(i) => {
-                    writeln!(
-                        f,
-                        "
-                    #[allow(dead_code)]\n
-                    pub const {}: usize = {};",
-                        key_name, i
-                    )?;
+                    writeln!(f, "pub const {}: usize = {};", key_name, i)?;
                 }
                 toml_edit::Value::String(s) => {
-                    writeln!(
-                        f,
-                        "
-                    #[allow(dead_code)]\n
-                    pub const {}: &str = \"{}\";",
-                        key_name, s
-                    )?;
+                    writeln!(f, "pub const {}: &str = \"{}\";", key_name, s)?;
                 }
                 _ => {
                     panic!("Unsupported value type");
