@@ -63,6 +63,6 @@ endforeach()
 add_custom_command(
     OUTPUT syscall_ids.h
     COMMAND sed ARGS -n -e s/__NR_/SYS_/p
-        < ${CMAKE_SOURCE_DIR}/lib/syscall_ids.h.in
+        < ${CMAKE_SOURCE_DIR}/${ARCH_DIR}/syscall_ids.h.in
         > ${CMAKE_SOURCE_DIR}/lib/syscall_ids.h
 )
