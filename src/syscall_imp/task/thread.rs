@@ -67,13 +67,13 @@ pub(crate) fn sys_arch_prctl(code: i32, addr: u64) -> isize {
             // TODO: check the legality of the address
             Ok(ArchPrctlCode::SetFs) => {
                 unsafe {
-                    axhal::arch::write_thread_pointer(addr as usize);
+                    axhal::asm::write_thread_pointer(addr as usize);
                 }
                 Ok(0)
             }
             Ok(ArchPrctlCode::GetFs) => {
                 unsafe {
-                    *(addr as *mut u64) = axhal::arch::read_thread_pointer() as u64;
+                    *(addr as *mut u64) = axhal::asm::read_thread_pointer() as u64;
                 }
                 Ok(0)
             }

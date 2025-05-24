@@ -1,4 +1,4 @@
-AX_ROOT ?= $(PWD)/.arceos
+AX_ROOT ?= $(shell cat .axroot 2>/dev/null)
 AX_TESTCASE ?= nimbos
 ARCH ?= x86_64
 AX_TESTCASES_LIST=$(shell cat ./apps/$(AX_TESTCASE)/testcase_list | tr '\n' ',')
@@ -22,7 +22,7 @@ user_apps:
 test:
 	@./scripts/app_test.sh
 
-build run justrun debug disasm: ax_root
+build run justrun defconfig oldconfig debug disasm: ax_root
 	@make -C $(AX_ROOT) A=$(PWD) $@
 
 clean: ax_root

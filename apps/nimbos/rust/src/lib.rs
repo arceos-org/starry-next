@@ -1,8 +1,5 @@
 #![no_std]
 #![feature(linkage)]
-#![feature(asm_const)]
-#![feature(naked_functions)]
-#![feature(panic_info_message)]
 
 #[macro_use]
 pub mod console;

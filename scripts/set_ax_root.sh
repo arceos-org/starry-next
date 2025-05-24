@@ -11,3 +11,6 @@ mkdir -p .cargo
 sed -e "s|%AX_ROOT%|$AX_ROOT|g" scripts/config.toml.temp > .cargo/config.toml
 
 echo "Set AX_ROOT (ArceOS directory) to $AX_ROOT"
+
+cp "$AX_ROOT/Cargo.lock" Cargo.lock
+echo "$1" > .axroot

@@ -5,7 +5,7 @@ mod time;
 
 use axerrno::LinuxError;
 use axhal::{
-    arch::TrapFrame,
+    context::TrapFrame,
     trap::{register_trap_handler, SYSCALL},
 };
 use syscalls::Sysno;

@@ -1,7 +1,7 @@
 use alloc::sync::Arc;
 use core::sync::atomic::AtomicU64;
 
-use axhal::arch::UspaceContext;
+use axhal::context::UspaceContext;
 use axmm::AddrSpace;
 use axsync::Mutex;
 use axtask::{AxTaskRef, TaskExtRef, TaskInner};

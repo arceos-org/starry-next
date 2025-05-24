@@ -18,7 +18,7 @@ mod task;
 
 use alloc::sync::Arc;
 
-use axhal::arch::UspaceContext;
+use axhal::context::UspaceContext;
 use axsync::Mutex;
 
 #[no_mangle]
